@@ -1,0 +1,19 @@
+# --- tensorflow implementation/subfolder ---
+future==0.16.0
+#jupyter==1.0.0
+jupyter
+#matplotlib==2.2.2
+matplotlib
+notebook==5.0.0
+#numpy==1.14.3
+numpy
+observations==0.1.4
+pandas==0.19.2
+scikit-learn==0.19.1
+scipy==1.1.0
+seaborn==0.8.1
+tensorflow-gpu==1.7.0
+tqdm==4.19.5
+
+# --- util ---
+jupytext
