@@ -56,7 +56,7 @@ from tensorflow_probability import edward2 as ed
 
 from tqdm import tqdm
 import pandas as pd
-import layers
+import tensorflow.layers as layers
 # -
 
 hidden = 100
