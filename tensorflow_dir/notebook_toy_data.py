@@ -15,6 +15,8 @@
 
 # +
 # generate toy data
+from __future__ import division, print_function
+
 import numpy as np
 import time
 import warnings
@@ -42,7 +44,6 @@ plt.show()
 
 # +
 # import some stuff
-from __future__ import division, print_function
 
 import os
 
