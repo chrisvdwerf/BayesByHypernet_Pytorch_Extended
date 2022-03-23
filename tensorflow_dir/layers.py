@@ -3,7 +3,7 @@ from __future__ import absolute_import, print_function, division
 import tensorflow as tf
 import numpy as np
 
-from base_layers import *
+from tensorflow_dir.base_layers import *
 
 
 class BBHDenseLayer(BBHLayer):

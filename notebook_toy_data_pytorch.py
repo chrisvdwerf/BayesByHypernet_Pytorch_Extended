@@ -57,9 +57,10 @@ from tensorflow_probability import edward2 as ed
 
 from tqdm import tqdm
 import pandas as pd
-from ..tensorflow import layers as layers
-# import ...tensorflow.layers as layers
+# from tensorflow_dir import layers as layers
+# import ..tensorflow_dir.layers as layers
 # -
+import tensorflow_dir.layers as layers
 
 hidden = 100
 h_units = [16, 32, 64]
@@ -267,12 +268,14 @@ tfd = tfp.distributions
 cols = ['x', 'y', 'mode', 'mc']
 
 exps = {
-    'vanilla': 'MAP', 'implicit_fullkl_structured': 'Bayes by Hypernet',
-    'mnf': 'MNF', 'bbb': 'Bayes by Backprop', 
-    'dropout': 'MC-Dropout', 'ensemble': 'Ensemble',
+    'vanilla': 'MAP',
+    'implicit_fullkl_structured': 'Bayes by Hypernet',
+    # 'mnf': 'MNF',
+    'bbb': 'Bayes by Backprop',
+    # 'dropout': 'MC-Dropout', 'ensemble': 'Ensemble',
     'implicit_fullnoise': 'Bayes by Hypernet with Full Noise',
     'implicit_fullkl': 'Bayes by Hypernet with Full KL',
-    'hmc': 'Hamiltonian Monte Carlo'
+    # 'hmc': 'Hamiltonian Monte Carlo'
     }
 
 weight_dict = {}
