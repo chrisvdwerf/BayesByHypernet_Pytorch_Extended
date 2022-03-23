@@ -15,9 +15,11 @@
 
 # +
 # generate toy data
+from __future__ import division, print_function
 import numpy as np
 import time
 import warnings
+
 
 rng = np.random.RandomState(1)
 
@@ -42,7 +44,6 @@ plt.show()
 
 # +
 # import some stuff
-from __future__ import division, print_function
 
 import os
 
@@ -56,7 +57,8 @@ from tensorflow_probability import edward2 as ed
 
 from tqdm import tqdm
 import pandas as pd
-import tensorflow.layers as layers
+from ..tensorflow import layers as layers
+# import ...tensorflow.layers as layers
 # -
 
 hidden = 100
