@@ -214,7 +214,8 @@ def get_net(mode: str, ops: dict, data_x, data_y):
         return ops
 
 
-def train_and_predict(mode: str, data_x, data_y, linspace=np.linspace(-6, 6, num=500)) -> (pandas.DataFrame, dict):
+def train_and_predict(mode: str, data_x, data_y, linspace=np.linspace(-6, 6, num=500), seed_int=1) -> (
+pandas.DataFrame, dict):
     """
     mode - string of the mode
     data_x - datapoints x for training
@@ -231,8 +232,8 @@ def train_and_predict(mode: str, data_x, data_y, linspace=np.linspace(-6, 6, num
 
     # --- TENSORFLOW ---
     tf.reset_default_graph()
-    tf.set_random_seed(1)
-    tf.random.set_random_seed(1)  # dit werkt blijkbaar wel voor ons?
+    tf.set_random_seed(seed_int)
+    tf.random.set_random_seed(seed_int)  # dit werkt blijkbaar wel voor ons?
 
     tfd = tfp.distributions
 

@@ -20,7 +20,8 @@ def seed(seed):
     random.seed(seed)
 
 
-def train_and_predict(mode: str, data_x, data_y, linspace=np.linspace(-6, 6, num=500)) -> (pd.DataFrame, dict):
+def train_and_predict(mode: str, data_x, data_y, linspace=np.linspace(-6, 6, num=500), seed_int=42, name=None) -> (
+pd.DataFrame, dict):
     """
     mode - string of the mode
     data_x - datapoints x for training
@@ -33,7 +34,8 @@ def train_and_predict(mode: str, data_x, data_y, linspace=np.linspace(-6, 6, num
     cols = ['x', 'y', 'mode', 'mc']
     prediction_df = pd.DataFrame(columns=cols)
     weight_dict = {}
-    seed(42)
+    seed(seed_int)
+    name = name if name is not None else mode # name in dataframe
 
     batch_x = torch.from_numpy(data_x.astype(np.float32).reshape(20, 1))
     batch_y = torch.from_numpy(data_y.astype(np.float32).reshape(20, 1))
@@ -69,10 +71,10 @@ def train_and_predict(mode: str, data_x, data_y, linspace=np.linspace(-6, 6, num
                 predictions = model(batch_x)[:, 0]
             all_preds += predictions.numpy() / mcsteps
             new_df = pd.DataFrame(columns=cols, data=list(zip(
-                linspace, predictions.numpy(), [mode] * len(linspace), [mc] * len(linspace))))
+                linspace, predictions.numpy(), [name] * len(linspace), [mc] * len(linspace))))
 
             prediction_df = pd.concat([prediction_df, new_df])
     else:
         raise NotImplementedError("")
 
-    return prediction_df, {}
+    return prediction_df, weight_dict
