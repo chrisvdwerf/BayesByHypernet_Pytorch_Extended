@@ -49,7 +49,7 @@ import torch.nn as nn
 import torch.optim as optim
 import random
 from tqdm import trange
-from model import ToyNN
+from util.models.bbh import ToyNN
 import torch.distributions as dist
 
 def seed(seed):
@@ -72,10 +72,10 @@ optimizer = torch.optim.Adam(model.parameters(), lr=0.01, eps=1e-5)
 crit = lambda x, y: torch.sum(-1 * dist.Normal(0., 9.).log_prob(x - y))
 # -
 
-samples_before = model.sample(10000).detach().numpy()
-sns.distplot(samples_before[:, 0], bins=20)
-plt.show()
-print('{} - {}'.format(samples_before[:, 0].mean(), samples_before[:, 0].std()))
+# samples_before = model.sample(10000).detach().numpy()
+# sns.distplot(samples_before[:, 0], bins=20)
+# plt.show()
+# print('{} - {}'.format(samples_before[:, 0].mean(), samples_before[:, 0].std()))
 
 # +
 cols = ['x', 'y', 'mode', 'mc']
@@ -100,11 +100,11 @@ with trange(200) as pbar:
         pbar.set_postfix(loss=loss.detach().numpy(), mse=mse.detach().numpy(), kl=kl.detach().numpy())
 # -
 
-samples_after = model.sample(10000).detach().numpy()
-w_idx = 20
-sns.distplot(samples_after[:, w_idx], bins=100)
-plt.show()
-print('{} - {}'.format(samples_after[:, w_idx].mean(), samples_after[:, 0].std()))
+# samples_after = model.sample(10000).detach().numpy()
+# w_idx = 20
+# sns.distplot(samples_after[:, w_idx], bins=100)
+# plt.show()
+# print('{} - {}'.format(samples_after[:, w_idx].mean(), samples_after[:, 0].std()))
 
 # +
 mcsteps = 100

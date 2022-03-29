@@ -51,9 +51,28 @@ linspace = np.linspace(-6, 6, num=500)
 cols = ['x', 'y', 'mode', 'mc']
 
 exps = {
-    'vanilla': 'MAP',
-    'implicit_pytorch': 'Bayes by Hypernet (torch)',
-    'implicit_fullkl_structured': 'Bayes by Hypernet',
+    # 'vanilla': 'MAP',
+    # 'implicit_pytorch_1': 'Bayes by Hypernet (torch)',
+    # 'implicit_pytorch_2': 'Bayes by Hypernet (torch)',
+    # 'implicit_pytorch_3': 'Bayes by Hypernet (torch)',
+    # 'implicit_pytorch_4': 'Bayes by Hypernet (torch)',
+    # 'implicit_pytorch_5': 'Bayes by Hypernet (torch)',
+    # 'implicit_pytorch_6': 'Bayes by Hypernet (torch)',
+    # 'implicit_pytorch_8': 'Bayes by Hypernet (torch)',
+    # 'implicit_pytorch_3': 'Bayes by Hypernet (torch)',
+    # 'implicit_pytorch_4': 'Bayes by Hypernet (torch)',
+    # 'implicit_pytorch_5': 'Bayes by Hypernet (torch)',
+    # 'implicit_pytorch_6': 'Bayes by Hypernet (torch)',
+    # 'implicit_pytorch_': 'Bayes by Hypernet (torch)',
+'implicit_fullkl_structured1': 'Bayes by Hypernet',
+'implicit_fullkl_structured2': 'Bayes by Hypernet',
+'implicit_fullkl_structured3': 'Bayes by Hypernet',
+'implicit_fullkl_structured4': 'Bayes by Hypernet',
+'implicit_fullkl_structured5': 'Bayes by Hypernet',
+'implicit_fullkl_structured6': 'Bayes by Hypernet',
+'implicit_fullkl_structured8': 'Bayes by Hypernet',
+
+    # 'implicit_fullkl_structured': 'Bayes by Hypernet',
     # 'mnf': 'MNF',
     # 'bbb': 'Bayes by Backprop',
     # 'dropout': 'MC-Dropout', 'ensemble': 'Ensemble',
@@ -68,11 +87,11 @@ import util.toy_data_pytorch as torch_util
 prediction_df = pd.DataFrame(columns=cols)
 weight_dict = {}
 
-for mode in exps.keys():
+for seed, mode in enumerate(exps.keys()):
     if 'pytorch' in mode:  # pytorch
-        dataframe, weight_dict = torch_util.train_and_predict(mode, data_x, data_y)
+        dataframe, weight_dict = torch_util.train_and_predict(mode, data_x, data_y, seed_int=seed)
     else:  # tensorflow
-        dataframe, weight_dict = tf_util.train_and_predict(mode, data_x, data_y)
+        dataframe, weight_dict = tf_util.train_and_predict(mode, data_x, data_y, seed_int=seed)
 
     prediction_df = pd.concat([prediction_df, dataframe])
 
@@ -91,21 +110,21 @@ t = exps
 # prediction_df['title'] = [exps[f] for f in prediction_df['mode']]
 # -
 
-with warnings.catch_warnings():
-    warnings.simplefilter("ignore")
-    fig, axes = plt.subplots(1, 9, figsize=(40, 7), sharey=True)
-    for i, (mode, label) in enumerate(exps.items()):
-        mode_df = prediction_df[prediction_df['mode'] == mode]
-        # axes[i].set_title(label)
-        axes[i].plot(linspace, linspace ** 3, '--', label='Real function')
-        axes[i].plot(data_x, data_y, 'o', color='black', label='Samples')
-        sns.tsplot(mode_df, time='x', value='y', condition='title', unit='mc', ci='sd', ax=axes[i])
-        l = axes[i].legend(loc=0)
-        l.set_title('')
-    plt.ylim(-100, 100)
-    sns.despine()
-    plt.tight_layout()
-    plt.show()
+# with warnings.catch_warnings():
+#     warnings.simplefilter("ignore")
+#     fig, axes = plt.subplots(1, 9, figsize=(40, 7), sharey=True)
+#     for i, (mode, label) in enumerate(exps.items()):
+#         mode_df = prediction_df[prediction_df['mode'] == mode]
+#         # axes[i].set_title(label)
+#         axes[i].plot(linspace, linspace ** 3, '--', label='Real function')
+#         axes[i].plot(data_x, data_y, 'o', color='black', label='Samples')
+#         sns.tsplot(mode_df, time='x', value='y', condition='title', unit='mc', ci='sd', ax=axes[i])
+#         l = axes[i].legend(loc=0)
+#         l.set_title('')
+#     plt.ylim(-100, 100)
+#     sns.despine()
+#     plt.tight_layout()
+#     plt.show()
 
 colours = sns.color_palette(n_colors=9)
 
