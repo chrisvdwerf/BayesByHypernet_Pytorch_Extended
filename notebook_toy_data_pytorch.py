@@ -65,9 +65,6 @@ exps = {
 import util.toy_data_tensorflow as tf_util
 import util.toy_data_pytorch as torch_util
 
-# from util.toy_data_tensorflow import train_and_predict
-
-
 prediction_df = pd.DataFrame(columns=cols)
 weight_dict = {}
 

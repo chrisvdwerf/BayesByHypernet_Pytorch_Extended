@@ -216,9 +216,15 @@ def get_net(mode: str, ops: dict, data_x, data_y):
 
 def train_and_predict(mode: str, data_x, data_y, linspace=np.linspace(-6, 6, num=500)) -> (pandas.DataFrame, dict):
     """
-    Receives the distribution - tfd
-    outputs a dataframe,
+    mode - string of the mode
+    data_x - datapoints x for training
+    data_y - datapoints y for training
+    linspace - prediction samples x
+    --- output ---
+    dataframe - all predictions in linspace
+    weight_dict - dictionary with one key for the weights of the model used defined by mode
     """
+
     cols = ['x', 'y', 'mode', 'mc']
     prediction_df = pd.DataFrame(columns=cols)
     weight_dict = {}
