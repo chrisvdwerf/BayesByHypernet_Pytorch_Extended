@@ -37,10 +37,10 @@ linspace = np.linspace(-6, 6, num=500)
 import matplotlib.pyplot as plt
 import seaborn as sns
 
-plt.figure(figsize=(10, 7))
-plt.plot(linspace, linspace ** 3)
-plt.plot(data_x, data_y, 'ro')
-plt.show()
+# plt.figure(figsize=(10, 7))
+# plt.plot(linspace, linspace ** 3)
+# plt.plot(data_x, data_y, 'ro')
+# plt.show()
 
 # +
 # import some stuff
@@ -286,6 +286,7 @@ for mode in exps.keys():
 
     tf.reset_default_graph()
     tf.set_random_seed(1)
+    tf.random.set_random_seed(1) # dit werkt blijkbaar wel voor ons?
     
     ops = {}
 
@@ -577,11 +578,11 @@ for i, (mode, label) in enumerate(t.items()):
                          mean_pred + 3 * std_pred,
                          mean_pred - 3 * std_pred,
                          color=colours[i], alpha=0.1)
-plt.ylim(-100, 100)
-l = plt.legend(loc=0)
-l.set_title('')
-sns.despine()
-plt.show()
+# plt.ylim(-100, 100)
+# l = plt.legend(loc=0)
+# l.set_title('')
+# sns.despine()
+# plt.show()
 # -
 
 len(exps.keys())
