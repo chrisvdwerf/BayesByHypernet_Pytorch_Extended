@@ -7,7 +7,7 @@ from typing import List
 
 def log_gauss(mean: th.Tensor, std: th.Tensor, x: th.Tensor) -> th.Tensor:
     return - ((x - mean) ** 2) / (2 * std ** 2) \
-           + float(-0.5 * np.log(2 * np.pi) - np.log(np.abs(std)))
+           + -th.log(th.abs(std)) - 0.5 * np.log(2 * np.pi)
 
 
 def std_from_rho(rho: th.Tensor) -> th.Tensor:
@@ -50,11 +50,11 @@ class BBBLayer(nn.Module):
             b = self.mu_b + std_from_rho(self.rho_b) * epsilon_b
 
             # store the sampled weights and biases
-            self.sampled_w[i, :, :] = w
-            self.sampled_b[i, :, :] = b
+            self.sampled_w[i] = w
+            self.sampled_b[i] = b
 
             # calculate output based on sampled weights
-            y[i, :, :] = th.mm(x[i, :, :], w) + b
+            y[i] = th.mm(x[i], w) + b
 
         return y
 
@@ -82,18 +82,20 @@ def bbb_criterion(y_preds: th.Tensor, y_target: th.Tensor, bbb_layers: List[BBBL
         for layer in bbb_layers:
 
             # add model likelihood loss for this particular layer of this weight sample
-            w_likelihood = th.sum(log_gauss(layer.mu_w[i], std_from_rho(layer.rho_w)[i],
+            w_likelihood = th.sum(log_gauss(layer.mu_w, std_from_rho(layer.rho_w),
                                             layer.sampled_w[i]))
-            b_likelihood = th.sum(log_gauss(layer.mu_b[i], std_from_rho(layer.rho_b)[i],
+            b_likelihood = th.sum(log_gauss(layer.mu_b, std_from_rho(layer.rho_b),
                                             layer.sampled_b[i]))
 
             model_likelihood_loss += w_likelihood + b_likelihood
 
             # add model prior loss for this particular layer of this weight sample
-            w_prior = th.sum(log_gauss(th.zeros_like(layer.sampled_w[i]),
-                                       th.ones_like(layer.sampled_w[i]), layer.sampled_w[i]))
-            b_prior = th.sum(log_gauss(th.zeros_like(layer.sampled_b[i]),
-                                       th.ones_like(layer.sampled_b[i]), layer.sampled_b[i]))
+            w_prior = th.sum(log_gauss(th.zeros_like(layer.sampled_w[0]),
+                                       th.full_like(layer.sampled_w[0], simplicity_prior),
+                                       layer.sampled_w[i]))
+            b_prior = th.sum(log_gauss(th.zeros_like(layer.sampled_b[0]),
+                                       th.full_like(layer.sampled_b[0], simplicity_prior),
+                                       layer.sampled_b[i]))
 
             model_prior_loss -= w_prior + b_prior
 
