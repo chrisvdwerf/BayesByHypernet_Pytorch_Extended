@@ -51,14 +51,14 @@ linspace = np.linspace(-6, 6, num=500)
 cols = ['x', 'y', 'mode', 'mc']
 
 exps = {
-    # 'bbb_pytorch': 'Bayes by Backprop (torch)',
     'vanilla': 'MAP',
+    'implicit_pytorch': 'Bayes by Hypernet (torch)',
     'implicit_fullkl_structured': 'Bayes by Hypernet',
     # 'mnf': 'MNF',
-    'bbb': 'Bayes by Backprop',
+    # 'bbb': 'Bayes by Backprop',
     # 'dropout': 'MC-Dropout', 'ensemble': 'Ensemble',
-    'implicit_fullnoise': 'Bayes by Hypernet with Full Noise',
-    'implicit_fullkl': 'Bayes by Hypernet with Full KL',
+    # 'implicit_fullnoise': 'Bayes by Hypernet with Full Noise',
+    # 'implicit_fullkl': 'Bayes by Hypernet with Full KL',
     # 'hmc': 'Hamiltonian Monte Carlo'
 }
 
@@ -88,7 +88,7 @@ colours = sns.color_palette(n_colors=9)
 #     'dropout': 'MC-Dropout', 'vanilla': 'MAP', 'ensemble': 'Ensemble'}
 t = exps
 
-prediction_df['title'] = [exps[f] for f in prediction_df['mode']]
+# prediction_df['title'] = [exps[f] for f in prediction_df['mode']]
 # -
 
 with warnings.catch_warnings():
