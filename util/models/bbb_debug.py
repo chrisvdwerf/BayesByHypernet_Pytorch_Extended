@@ -1,4 +1,4 @@
-from models.bbb import *
+from util.models.bbb import *
 import torch as th
 
 

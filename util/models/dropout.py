@@ -7,7 +7,7 @@ from torch.nn.parameter import Parameter
 import torch.nn.functional as F
 import torch.distributions as dist
 
-class DropoutNN(nn.module):
+class DropoutNN(nn.Module):
     def __init__(self, units=[16, 32, 64]):
         super(DropoutNN, self).__init__()
         self.layer1_w = torch.zeros((100, 1))

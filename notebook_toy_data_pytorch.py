@@ -64,13 +64,13 @@ exps = {
     # 'implicit_pytorch_5': 'Bayes by Hypernet (torch)',
     # 'implicit_pytorch_6': 'Bayes by Hypernet (torch)',
     # 'implicit_pytorch_': 'Bayes by Hypernet (torch)',
-'implicit_fullkl_structured1': 'Bayes by Hypernet',
-'implicit_fullkl_structured2': 'Bayes by Hypernet',
-'implicit_fullkl_structured3': 'Bayes by Hypernet',
-'implicit_fullkl_structured4': 'Bayes by Hypernet',
-'implicit_fullkl_structured5': 'Bayes by Hypernet',
-'implicit_fullkl_structured6': 'Bayes by Hypernet',
-'implicit_fullkl_structured8': 'Bayes by Hypernet',
+    # 'implicit_fullkl_structured1': 'Bayes by Hypernet',
+    # 'implicit_fullkl_structured2': 'Bayes by Hypernet',
+    # 'implicit_fullkl_structured3': 'Bayes by Hypernet',
+    # 'implicit_fullkl_structured4': 'Bayes by Hypernet',
+    # 'implicit_fullkl_structured5': 'Bayes by Hypernet',
+    # 'implicit_fullkl_structured6': 'Bayes by Hypernet',
+    # 'implicit_fullkl_structured8': 'Bayes by Hypernet',
 
     # 'implicit_fullkl_structured': 'Bayes by Hypernet',
     # 'mnf': 'MNF',
@@ -79,6 +79,7 @@ exps = {
     # 'implicit_fullnoise': 'Bayes by Hypernet with Full Noise',
     # 'implicit_fullkl': 'Bayes by Hypernet with Full KL',
     # 'hmc': 'Hamiltonian Monte Carlo'
+    'bbb_pytorch': 'Bayes by Backprop - Pytorch',
 }
 
 import util.toy_data_tensorflow as tf_util
@@ -611,4 +612,3 @@ with warnings.catch_warnings():
     sns.despine()
     plt.tight_layout()
     plt.show()
-# -
