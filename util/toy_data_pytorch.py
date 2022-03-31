@@ -79,8 +79,10 @@ pd.DataFrame, dict):
                 linspace, predictions.numpy(), [name] * len(linspace), [mc] * len(linspace))))
 
             prediction_df = pd.concat([prediction_df, new_df])
-    elif mode == 'dropout_torch':
-        model = DropoutNN(batch_x)
+
+
+    elif "dropout" in mode:
+        model = DropoutNN()
         optimiser = torch.optim.Adam(model.parameters(), lr=0.1, eps=1e-5)
         with trange(40) as pbar:
             for i in pbar:
@@ -94,7 +96,7 @@ pd.DataFrame, dict):
         prediction_df = pd.DataFrame(columns=cols)
         mcsteps = 100
         all_preds = np.zeros(len(linspace))
-        torch.from_numpy(linspace[:, np.newaxis].astype(np.float32))
+        batch_x = torch.from_numpy(linspace[:, np.newaxis].astype(np.float32))
         for mc in range(mcsteps):
             with torch.no_grad():
                 predictions = model(batch_x)[:, 0]
@@ -103,6 +105,7 @@ pd.DataFrame, dict):
                 linspace, predictions.numpy(), [mode] * len(linspace), [mc] * len(linspace))))
 
             prediction_df = pd.concat([prediction_df, new_df])
+
     elif mode == 'bbb_pytorch':
 
         # Construct model

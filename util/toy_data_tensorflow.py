@@ -184,7 +184,7 @@ def get_net(mode: str, ops: dict, data_x, data_y):
 
                 ops['kl_loss'] = kl_loss
 
-            elif mode == 'dropout':
+            elif 'dropout' in mode:
                 x = tf.layers.dense(inputs=x, units=hidden, activation=tf.nn.relu)
 
                 noise_shape = tf.cond(pred_mode, lambda: tf.constant([1, hidden], tf.int32), lambda: tf.shape(x))
@@ -406,7 +406,7 @@ pandas.DataFrame, dict):
 
     # run predictions after training
     all_preds = np.zeros(len(linspace))
-    if mode == 'dropout' or 'implicit' in mode or mode == 'bbb' or mode == 'mnf':
+    if 'dropout' in mode or 'implicit' in mode or mode == 'bbb' or mode == 'mnf':
         mcsteps = 100
 
         for mc in range(mcsteps):

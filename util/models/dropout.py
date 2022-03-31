@@ -7,22 +7,20 @@ from torch.nn.parameter import Parameter
 import torch.nn.functional as F
 import torch.distributions as dist
 
+
 class DropoutNN(nn.Module):
-    def __init__(self, units=[16, 32, 64]):
+    def __init__(self):
         super(DropoutNN, self).__init__()
-        self.layer1_w = torch.zeros((100, 1))
-        self.layer1_b = torch.zeros((100, ))
-        self.layer2_w = torch.zeros((100, 1))
-        self.layer2_b = torch.zeros((1, ))
-    
+        self.layer1_w = nn.Linear(1, 100, bias=True)
+        self.relu = nn.ReLU()
+        self.dropout = nn.Dropout(p=0.8)
+        self.layer2_w = nn.Linear(100, 1, bias=True)#torch.zeros((100, 1))
+
+
     def forward(self, x):
-        w1 = self.layer1_w
-        b1 = self.layer1_b
+        x = self.layer1_w(x)
+        x = self.relu(x)
+        x = self.dropout(x)
+        x = self.layer2_w(x)
 
-        w2 = self.layer2_w
-        b2 = self.layer2_b
-
-        x = F.linear(x, w1, b1)
-        x = F.relu(x)
-        x = F.dropout(0.5)
-        x = F.linear(x, w2, b2)
+        return x
