@@ -88,20 +88,24 @@ pd.DataFrame, dict):
                 optimiser.zero_grad()
                 preds = model(batch_x)
                 loss = torch.mean(crit(preds, batch_y))
+
+                loss.backward()
                 optimiser.step()
-                pbar.set_postfix(loss=loss)
+                pbar.set_postfix(loss=loss.detach().numpy())
             pbar.close()
         
+
         prediction_df = pd.DataFrame(columns=cols)
         mcsteps = 100
         all_preds = np.zeros(len(linspace))
         batch_x = torch.from_numpy(linspace[:, np.newaxis].astype(np.float32))
+
         for mc in range(mcsteps):
             with torch.no_grad():
-                predictions = model(batch_x)[:, 0]
+                predictions = model(batch_x)[:, 0] # keep flag: [1, 100] in tensorflow version
             all_preds += predictions.numpy() / mcsteps
             new_df = pd.DataFrame(columns=cols, data=list(zip(
-                linspace, predictions.numpy(), [mode] * len(linspace), [mc] * len(linspace))))
+                linspace, predictions.numpy(), [name] * len(linspace), [mc] * len(linspace))))
 
             prediction_df = pd.concat([prediction_df, new_df])
     else:
