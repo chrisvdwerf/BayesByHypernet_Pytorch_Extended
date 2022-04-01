@@ -115,7 +115,7 @@ pd.DataFrame, dict):
         model = nn.Sequential(bbb_l1, nn.ReLU(), bbb_l2)
 
         # Train model
-        optimiser = torch.optim.Adam(model.parameters())
+        optimiser = torch.optim.Adam(model.parameters(), lr=0.1, eps=1e-5)
         n_epochs = 40
 
         with trange(n_epochs) as pbar:
@@ -136,12 +136,13 @@ pd.DataFrame, dict):
             with torch.no_grad():
                 # Note: predictions contains multiple samples because bbb takes multiple weight
                 # samples by default.
-                predictions = model(batch_x.repeat(n_weight_samples, 1, 1))[:, 0]
+                predictions = model(batch_x.repeat(n_weight_samples, 1, 1))[:, :, 0]
 
             for weight_sample_i in range(n_weight_samples):
-                all_preds += predictions[weight_sample_i].numpy() / mcsteps
+                sample_predictions = predictions[weight_sample_i]
+                all_preds += sample_predictions.numpy() / mcsteps
                 new_df = pd.DataFrame(columns=cols, data=list(zip(
-                    linspace, predictions.numpy(), [name] * len(linspace), [mc] * len(linspace))))
+                    linspace, sample_predictions.numpy(), [name] * len(linspace), [mc] * len(linspace))))
 
                 prediction_df = pd.concat([prediction_df, new_df])
 

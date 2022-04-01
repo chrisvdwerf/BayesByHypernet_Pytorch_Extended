@@ -52,7 +52,7 @@ cols = ['x', 'y', 'mode', 'mc']
 
 exps = {
     # 'vanilla': 'MAP',
-    # 'implicit_pytorch_1': 'Bayes by Hypernet (torch)',
+    'implicit_pytorch_1': 'Bayes by Hypernet (torch)',
     # 'implicit_pytorch_2': 'Bayes by Hypernet (torch)',
     # 'implicit_pytorch_3': 'Bayes by Hypernet (torch)',
     # 'implicit_pytorch_4': 'Bayes by Hypernet (torch)',

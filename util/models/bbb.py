@@ -59,7 +59,6 @@ class BBBLayer(nn.Module):
         return y
 
 
-# (n_weight_samples, n_data_samples, n_features)
 # x: (n_weight_samples, n_data_samples, n_inputs) <- if not the first layer, x might have different
 #       values over the weight sample dimension.
 
