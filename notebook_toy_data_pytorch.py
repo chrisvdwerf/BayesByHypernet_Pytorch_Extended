@@ -35,7 +35,7 @@ num_samples = 20
 
 data_x = rng.uniform(low=-4, high=4, size=(num_samples,))
 data_y = data_x ** 3 + rng.normal(loc=0, scale=9, size=(num_samples,))
-
+ 
 linspace = np.linspace(-6, 6, num=500)
 
 # +
