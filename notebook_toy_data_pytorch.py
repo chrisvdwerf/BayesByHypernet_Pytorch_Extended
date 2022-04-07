@@ -52,7 +52,7 @@ cols = ['x', 'y', 'mode', 'mc']
 
 exps = {
     # 'vanilla': 'MAP',
-    # 'implicit_pytorch_1': 'Bayes by Hypernet (torch)',
+    'implicit_pytorch_1': 'Bayes by Hypernet (torch)',
     # 'implicit_pytorch_2': 'Bayes by Hypernet (torch)',
     # 'implicit_pytorch_3': 'Bayes by Hypernet (torch)',
     # 'implicit_pytorch_4': 'Bayes by Hypernet (torch)',
@@ -75,18 +75,19 @@ exps = {
     # 'implicit_fullkl_structured': 'Bayes by Hypernet',
     # 'mnf': 'MNF',
     # 'bbb': 'Bayes by Backprop',
-    'dropout1_pytorch': 'MC-Dropout',
-    'dropout2_pytorch': 'MC-Dropout',
-    'dropout3_pytorch': 'MC-Dropout',
-    'dropout4_pytorch': 'MC-Dropout',
-    'dropout5_pytorch': 'MC-Dropout',
-    'dropout6_pytorch': 'MC-Dropout',
-    'dropout8_pytorch': 'MC-Dropout',
+    # 'dropout1_pytorch': 'MC-Dropout',
+    # 'dropout2_pytorch': 'MC-Dropout',
+    # 'dropout3_pytorch': 'MC-Dropout',
+    # 'dropout4_pytorch': 'MC-Dropout',
+    # 'dropout5_pytorch': 'MC-Dropout',
+    # 'dropout6_pytorch': 'MC-Dropout',
+    # 'dropout8_pytorch': 'MC-Dropout',
 
     # 'ensemble': 'Ensemble',
     # 'implicit_fullnoise': 'Bayes by Hypernet with Full Noise',
     # 'implicit_fullkl': 'Bayes by Hypernet with Full KL',
     # 'hmc': 'Hamiltonian Monte Carlo'
+    'bbb_pytorch': 'Bayes by Backprop (pytorch)',
 }
 
 import util.toy_data_tensorflow as tf_util

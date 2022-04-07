@@ -9,6 +9,7 @@ import torch.optim as optim
 import random
 from tqdm import trange
 from util.models.dropout import DropoutNN
+from util.models.bbb import BBBLayer, bbb_criterion
 from .models.bbh import ToyNN
 import torch.distributions as dist
 
@@ -108,6 +109,47 @@ pd.DataFrame, dict):
                 linspace, predictions.numpy(), [name] * len(linspace), [mc] * len(linspace))))
 
             prediction_df = pd.concat([prediction_df, new_df])
+
+    elif mode == 'bbb_pytorch':
+
+        # Construct model
+        n_weight_samples = 5
+        bbb_l1 = BBBLayer(1, hidden, n_weight_samples)
+        bbb_l2 = BBBLayer(hidden, 1, n_weight_samples)
+        model = nn.Sequential(bbb_l1, nn.ReLU(), bbb_l2)
+
+        # Train model
+        optimiser = torch.optim.Adam(model.parameters(), lr=0.1, eps=1e-5)
+        n_epochs = 40
+
+        with trange(n_epochs) as pbar:
+            for epoch in pbar:
+                optimiser.zero_grad()
+                preds = model(batch_x.repeat(n_weight_samples, 1, 1))
+                loss = bbb_criterion(preds, batch_y, [bbb_l1, bbb_l2])
+                loss.backward(retain_graph=(epoch < n_epochs - 1))
+                optimiser.step()
+            pbar.close()
+
+        # Predict and build dataframe
+        prediction_df = pd.DataFrame(columns=cols)
+        mcsteps = 100
+        all_preds = np.zeros(len(linspace))
+        batch_x = torch.from_numpy(linspace[:, np.newaxis].astype(np.float32))
+        for mc in range(mcsteps // n_weight_samples):
+            with torch.no_grad():
+                # Note: predictions contains multiple samples because bbb takes multiple weight
+                # samples by default.
+                predictions = model(batch_x.repeat(n_weight_samples, 1, 1))[:, :, 0]
+
+            for weight_sample_i in range(n_weight_samples):
+                sample_predictions = predictions[weight_sample_i]
+                all_preds += sample_predictions.numpy() / mcsteps
+                new_df = pd.DataFrame(columns=cols, data=list(zip(
+                    linspace, sample_predictions.numpy(), [name] * len(linspace), [mc] * len(linspace))))
+
+                prediction_df = pd.concat([prediction_df, new_df])
+
     else:
         raise NotImplementedError("")
 
