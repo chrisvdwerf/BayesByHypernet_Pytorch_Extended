@@ -53,12 +53,12 @@ cols = ['x', 'y', 'mode', 'mc']
 exps = {
     # 'vanilla': 'MAP',
     'implicit_pytorch_1': 'Bayes by Hypernet (torch)',
-    # 'implicit_pytorch_2': 'Bayes by Hypernet (torch)',
-    # 'implicit_pytorch_3': 'Bayes by Hypernet (torch)',
-    # 'implicit_pytorch_4': 'Bayes by Hypernet (torch)',
-    # 'implicit_pytorch_5': 'Bayes by Hypernet (torch)',
-    # 'implicit_pytorch_6': 'Bayes by Hypernet (torch)',
-    # 'implicit_pytorch_8': 'Bayes by Hypernet (torch)',
+    'implicit_pytorch_2_ns10_': 'Bayes by Hypernet (torch)',
+    'implicit_pytorch_3_ns20_': 'Bayes by Hypernet (torch)',
+    'implicit_pytorch_4_ns30_': 'Bayes by Hypernet (torch)',
+    'implicit_pytorch_5_ns50_': 'Bayes by Hypernet (torch)',
+    'implicit_pytorch_6_ns100_': 'Bayes by Hypernet (torch)',
+    'implicit_pytorch_8_ns200_': 'Bayes by Hypernet (torch)',
     # 'implicit_pytorch_3': 'Bayes by Hypernet (torch)',
     # 'implicit_pytorch_4': 'Bayes by Hypernet (torch)',
     # 'implicit_pytorch_5': 'Bayes by Hypernet (torch)',
@@ -87,7 +87,7 @@ exps = {
     # 'implicit_fullnoise': 'Bayes by Hypernet with Full Noise',
     # 'implicit_fullkl': 'Bayes by Hypernet with Full KL',
     # 'hmc': 'Hamiltonian Monte Carlo'
-    'bbb_pytorch': 'Bayes by Backprop (pytorch)',
+    # 'bbb_pytorch': 'Bayes by Backprop (pytorch)',
 }
 
 import util.toy_data_tensorflow as tf_util
@@ -97,6 +97,7 @@ prediction_df = pd.DataFrame(columns=cols)
 weight_dict = {}
 
 for seed, mode in enumerate(exps.keys()):
+    seed = 1
     if 'pytorch' in mode:  # pytorch
         dataframe, weight_dict = torch_util.train_and_predict(mode, data_x, data_y, seed_int=seed)
     else:  # tensorflow

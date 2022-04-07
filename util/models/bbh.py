@@ -33,20 +33,30 @@ class HypernetWeight(nn.Module):
 
 
 class ToyNN(nn.Module):
-    def __init__(self, units=[16, 32, 64]):
+    def __init__(self, units=[16, 32, 64], noise_shape=1, noise_sharing=True):
         super(ToyNN, self).__init__()
-        self.layer1_w = HypernetWeight((100, 1), units=units)
-        self.layer1_b = HypernetWeight((100, ), units=units)
-        self.layer2_w = HypernetWeight((1, 100), units=units)
-        self.layer2_b = HypernetWeight((1, ), units=units)
+        self.noise_shape = noise_shape
+        self.noise_sharing = noise_sharing
+        self.layer1_w = HypernetWeight((100, 1), units=units, noise_shape=noise_shape)
+        self.layer1_b = HypernetWeight((100,), units=units, noise_shape=noise_shape)
+        self.layer2_w = HypernetWeight((1, 100), units=units, noise_shape=noise_shape)
+        self.layer2_b = HypernetWeight((1,), units=units, noise_shape=noise_shape)
+
+    def _generate_noise(self):
+        return torch.randn((1, self.noise_shape))
 
     def forward(self, x):
-        n = torch.randn((1, 1))
-        w1 = self.layer1_w(n)[0]
-        b1 = self.layer1_b(n)[0]
+        nw1 = self._generate_noise()
+        if self.noise_sharing:
+            nb1, nw2, nb2 = nw1, nw1, nw1
+        else:
+            nb1, nw2, nb2 = self._generate_noise(), self._generate_noise(), self._generate_noise()
 
-        w2 = self.layer2_w(n)[0]
-        b2 = self.layer2_b(n)[0]
+        w1 = self.layer1_w(nw1)[0]
+        b1 = self.layer1_b(nb1)[0]
+
+        w2 = self.layer2_w(nw2)[0]
+        b2 = self.layer2_b(nb2)[0]
 
         x = F.linear(x, w1, b1)
         x = F.relu(x)
@@ -97,6 +107,8 @@ class ToyNN(nn.Module):
             ww_dist = torch.min(ww_distances, 1)[0]
 
             # sum over weights, mean over samples
+            # Basically calculating the divergence for each
+            # weight, instead of for the entire sample like with full_kernels
             kl = torch.sum(torch.mean(
                 torch.log(wp_dist / (ww_dist + 1e-8) + 1e-8)
                 + torch.log(float(num_samples) / (num_samples - 1)), 1))

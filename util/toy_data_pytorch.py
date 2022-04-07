@@ -45,8 +45,18 @@ pd.DataFrame, dict):
 
     crit = lambda x, y: torch.sum(-1 * dist.Normal(0., 9.).log_prob(x - y))
 
+
     if "implicit" in mode:
-        model = ToyNN()
+        # -- Noise shape --
+        noises = [int(i.replace("ns", "")) for i in mode.split("_") if i[0:2] == "ns"] # noises declared; e.g. _ns100_
+        noises.append(1)  # default noise shape of 1 if not specified
+        noise_shape = noises[0]
+        print("Noise shape ", noise_shape)
+
+        # -- Noise sharing --
+        noise_sharing = True
+
+        model = ToyNN(noise_shape=noise_shape, noise_sharing=noise_sharing)
         optimizer = torch.optim.Adam(model.parameters(), lr=0.01, eps=1e-5)
 
         # === TRAIN ===
