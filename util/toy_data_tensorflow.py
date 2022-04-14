@@ -120,12 +120,12 @@ def get_net(mode: str, ops: dict, data_x, data_y):
             if 'implicit' in mode:
                 h_noise_shape = 1
                 aligned_noise = True
-                if mode == 'implicit_fullnoise':
-                    h_noise_shape = 100
-                    aligned_noise = False
-                elif mode == 'implicit_fullnoisesh':
+                if 'implicit_fullnoisesh' in mode:
                     h_noise_shape = 200
                     aligned_noise = True
+                elif 'implicit_fullnoise' in mode:
+                    h_noise_shape = 100
+                    aligned_noise = False
 
                 l1 = layers.BBHDenseLayer('l1', 1, hidden, h_units=h_units, h_use_bias=True,
                                           h_noise_shape=h_noise_shape, aligned_noise=aligned_noise)
@@ -244,7 +244,7 @@ pandas.DataFrame, dict):
 
     net_vars = tf.get_collection(tf.GraphKeys.TRAINABLE_VARIABLES, 'net')
 
-    if mode == 'implict':
+    if mode == 'implicit':
         lr = 0.02
     elif 'implicit' in mode:
         lr = 0.01

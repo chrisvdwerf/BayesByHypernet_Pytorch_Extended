@@ -111,6 +111,6 @@ class ToyNN(nn.Module):
             # weight, instead of for the entire sample like with full_kernels
             kl = torch.sum(torch.mean(
                 torch.log(wp_dist / (ww_dist + 1e-8) + 1e-8)
-                + torch.log(float(num_samples) / (num_samples - 1)), 1))
+                + torch.log(torch.Tensor([float(num_samples) / (num_samples - 1)])), 1))
 
         return kl

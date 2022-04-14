@@ -1,21 +1,15 @@
 import pandas as pd
 import numpy as np
-import time
-import warnings
-
 import torch
 import torch.nn as nn
-import torch.optim as optim
 import random
 from tqdm import trange
 from util.models.dropout import DropoutNN
 from util.models.bbb import BBBLayer, bbb_criterion
 from util.models.bbh import ToyNN
-import torch.distributions as dist
 
 from util.models.ensemble import Ensemble
 
-# import torchensemble.
 hidden = 100
 
 
@@ -75,7 +69,7 @@ def train_and_predict(mode: str, data_x, data_y, config={}, linspace=np.linspace
                 cur_anneal = np.clip(10. / (i + 1) - 1., 0., 1.)
                 preds = model(batch_x)
                 error = CONFIG_LOSS_CRIT(preds, batch_y)
-                kl = model.kl()
+                kl = model.kl(full_kernel=False)
 
                 loss = error + cur_anneal * kl
 
@@ -147,7 +141,6 @@ def train_and_predict(mode: str, data_x, data_y, config={}, linspace=np.linspace
             for epoch in pbar:
                 optimiser.zero_grad()
                 preds = model(batch_x.repeat(n_weight_samples, 1, 1))
-                # loss = bbb_criterion(preds, batch_y, [bbb_l1, bbb_l2])
                 loss = bbb_criterion(preds, batch_y, [bbb_l1, bbb_l2], crit=CONFIG_LOSS_CRIT)
                 loss.backward(retain_graph=(epoch < n_epochs - 1))
                 optimiser.step()

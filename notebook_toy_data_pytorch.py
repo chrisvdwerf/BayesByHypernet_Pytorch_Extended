@@ -49,7 +49,7 @@ basic_config = {
     "loss_crit": lambda x, y: torch.sum(-1 * dist.Normal(0., 9.).log_prob(x - y)),
 }
 
-# FIG_NAME = "figures/hypernet_noise1_shared_tensorflow"
+# FIG_NAME = "figures/hypernet_noise1_shared_pytorch"
 # FIG_NAME = "figures/hypernet_noise1_shared_pytorch"
 # FIG_NAME = "figures/hypernet_noise100_tensorflow"
 # FIG_NAME = "figures/hypernet_noise100_pytorch" # fullnoise
