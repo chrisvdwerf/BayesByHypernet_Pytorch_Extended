@@ -76,6 +76,7 @@ exps = {
         "title": "Bayes by Backprop",
         "training_it": 200,
         "lr": 0.01,
+        "loss_crit": lambda x, y: torch.sum(-1 * dist.Normal(0., 9.).log_prob(x - y)), # ditMSE?
     }), 1),
     **generate_N("implicit_pytorch_n1", merge_dicts(basic_config, {
         "desc": 'Bayes by Hypernet (noise-1)',
