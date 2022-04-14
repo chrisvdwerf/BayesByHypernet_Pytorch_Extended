@@ -49,16 +49,24 @@ basic_config = {
     "loss_crit": lambda x, y: torch.sum(-1 * dist.Normal(0., 9.).log_prob(x - y)),
 }
 
-FIG_NAME = "figures/hypernet_noise1_shared_tensorflow"
+# FIG_NAME = "figures/hypernet_noise1_shared_tensorflow"
+# FIG_NAME = "figures/hypernet_noise1_shared_pytorch"
+# FIG_NAME = "figures/hypernet_noise100_tensorflow"
+# FIG_NAME = "figures/hypernet_noise100_pytorch" # fullnoise
+FIG_NAME = "figures/hypernet_noise200_shared_tensorflow"
+# FIG_NAME = "figures/hypernet_noise200_shared_pytorch"
+# kl
+# kl
+
 STD_DEV_MULT = 1
 LEGEND = False
 exps = {
-    **generate_N("implicit_fullkl_structured", merge_dicts(basic_config, {
+    **generate_N("implicit_fullnoisesh", merge_dicts(basic_config, {
         "desc": 'Bayes by Hypernet (torch)',
         "training_it": 200,
         "lr": 0.01,
         "noise_shape": 200,
-        "noise_sharing": False
+        "noise_sharing": True
     }), 5),
 
 
