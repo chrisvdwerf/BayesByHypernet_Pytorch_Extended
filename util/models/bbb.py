@@ -64,7 +64,7 @@ class BBBLayer(nn.Module):
 
 
 def bbb_criterion(y_preds: th.Tensor, y_target: th.Tensor, bbb_layers: List[BBBLayer],
-                  simplicity_prior: float = 1.) -> th.Tensor:
+                  simplicity_prior: float = 1., crit=th.nn.MSELoss()) -> th.Tensor:
     # check the shapes: y: (n_weight_samples, n_data_samples, n_outputs)
     assert y_preds.shape[1] == y_target.shape[0]
     assert y_preds.shape[2] == y_target.shape[1]
@@ -102,7 +102,7 @@ def bbb_criterion(y_preds: th.Tensor, y_target: th.Tensor, bbb_layers: List[BBBL
     prediction_loss = 0
 
     for i in range(n_weight_samples):
-        prediction_loss += 0.5 * th.nn.MSELoss()(y_preds[i], y_target)
+        prediction_loss += 0.5 * crit(y_preds[i], y_target)
 
     total_loss = model_likelihood_loss + model_prior_loss + prediction_loss
     return total_loss / n_weight_samples  # normalize by number of weight samples

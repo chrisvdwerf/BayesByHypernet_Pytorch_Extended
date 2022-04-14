@@ -8,10 +8,10 @@ import torch.nn.functional as F
 import torch.distributions as dist
 
 class DropoutNN(nn.Module):
-    def __init__(self):
+    def __init__(self, hidden: int):
         super(DropoutNN, self).__init__()
-        self.layer1 = nn.Linear(1, 100)
-        self.layer2 = nn.Linear(100, 1)
+        self.layer1 = nn.Linear(1, hidden)
+        self.layer2 = nn.Linear(hidden, 1)
 
     def forward(self, x):
         x = self.layer1(x)

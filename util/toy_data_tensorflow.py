@@ -35,7 +35,7 @@ def get_net(mode: str, ops: dict, data_x, data_y):
 
         ops['pred_mode'] = pred_mode
 
-        if mode == 'ensemble':
+        if 'ensemble' in mode:
             adv_alpha = 0.5
             adv_eps = 1e-2
             ops['pred'] = []
@@ -141,7 +141,7 @@ def get_net(mode: str, ops: dict, data_x, data_y):
 
                 # build loss
                 loss = tf.reduce_mean(-1 * n.log_prob(x - y))
-            elif mode == 'bbb':
+            elif 'bbb' in mode:
 
                 # layer 1
                 l1 = layers.BBBDenseLayer('l1', 1, hidden, init_var=-3.)
@@ -327,14 +327,14 @@ pandas.DataFrame, dict):
 
         gvs = opt.compute_gradients(loss_g)
         optimiser = opt.apply_gradients(gvs)
-    elif mode == 'bbb' or mode == 'mnf':
+    elif 'bbb' in mode or mode == 'mnf':
         optimiser = opt.minimize(ops['loss'] + anneal * ops['kl_loss'])
 
         all_weights = tf.concat(
             [tf.transpose(t, [1, 0])
              for t in tf.get_collection('weight_samples')], 0)
         ops['all_weights'] = all_weights
-    elif mode == 'ensemble':
+    elif 'ensemble' in mode:
         optimiser = [opt.minimize(tot_loss) for tot_loss in ops['tot_loss']]
     elif mode == 'hmc':
         pass
@@ -356,10 +356,12 @@ pandas.DataFrame, dict):
 
     from tqdm import trange
     num_epochs = 200 if ('implicit' in mode and mode != 'implicit') else 40
+    # num_epochs = 40
+
     with trange(num_epochs) as pbar:  # run for 40 epochs
         for i in pbar:  # 300 epochs
             # get batch from dataset
-            if 'implicit' in mode or mode == 'bbb' or mode == 'mnf':
+            if 'implicit' in mode or 'bbb' in mode or mode == 'mnf':
                 cur_anneal = np.clip(10. / (i + 1) - 1., 0., 1.)
                 l_loss, kl_loss, _ = s.run([ops['loss'], ops['kl_loss'], optimiser],
                                            feed_dict={ops['x']: data_x[:, np.newaxis],
@@ -367,7 +369,7 @@ pandas.DataFrame, dict):
                                                       anneal: cur_anneal
                                                       })
                 pbar.set_postfix(ce=l_loss, kl_loss=kl_loss)
-            elif mode == 'ensemble':
+            elif 'ensemble' in mode:
                 ce = 0
                 for loss, opt in zip(ops['loss'], optimiser):
                     l_loss, _ = s.run([loss, opt],
@@ -406,7 +408,7 @@ pandas.DataFrame, dict):
 
     # run predictions after training
     all_preds = np.zeros(len(linspace))
-    if 'dropout' in mode or 'implicit' in mode or mode == 'bbb' or mode == 'mnf':
+    if 'dropout' in mode or 'implicit' in mode or 'bbb' in mode or mode == 'mnf':
         mcsteps = 100
 
         for mc in range(mcsteps):
@@ -416,7 +418,7 @@ pandas.DataFrame, dict):
                 linspace, predictions, [mode] * len(linspace), [mc] * len(linspace))))
 
             prediction_df = pd.concat([prediction_df, new_df])
-    elif mode == 'ensemble':
+    elif 'ensemble' in mode:
         for i, pred in enumerate(ops['pred']):
             predictions = s.run(pred, {ops['x']: linspace[:, np.newaxis]})[:, 0]
             all_preds += predictions / 10
@@ -446,7 +448,7 @@ pandas.DataFrame, dict):
 
     print(np.sqrt(np.mean((all_preds - linspace ** 3) ** 2)))
 
-    if 'implicit' in mode or mode == 'bbb' or mode == 'mnf':
+    if 'implicit' in mode or 'bbb' in mode or mode == 'mnf':
         weights = np.zeros((5000, 200))
         num_sample_runs = weights.shape[0] // 5
 

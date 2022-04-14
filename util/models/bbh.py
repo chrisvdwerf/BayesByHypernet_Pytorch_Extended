@@ -33,13 +33,13 @@ class HypernetWeight(nn.Module):
 
 
 class ToyNN(nn.Module):
-    def __init__(self, units=[16, 32, 64], noise_shape=1, noise_sharing=True):
+    def __init__(self, hidden: int, units=[16, 32, 64], noise_shape=1, noise_sharing=True):
         super(ToyNN, self).__init__()
         self.noise_shape = noise_shape
         self.noise_sharing = noise_sharing
-        self.layer1_w = HypernetWeight((100, 1), units=units, noise_shape=noise_shape)
-        self.layer1_b = HypernetWeight((100,), units=units, noise_shape=noise_shape)
-        self.layer2_w = HypernetWeight((1, 100), units=units, noise_shape=noise_shape)
+        self.layer1_w = HypernetWeight((hidden, 1), units=units, noise_shape=noise_shape)
+        self.layer1_b = HypernetWeight((hidden,), units=units, noise_shape=noise_shape)
+        self.layer2_w = HypernetWeight((1, hidden), units=units, noise_shape=noise_shape)
         self.layer2_b = HypernetWeight((1,), units=units, noise_shape=noise_shape)
 
     def _generate_noise(self):

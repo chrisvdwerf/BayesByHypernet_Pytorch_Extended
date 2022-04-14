@@ -1,28 +1,13 @@
-# ---
-# jupyter:
-#   jupytext:
-#     formats: ipynb,py:light
-#     text_representation:
-#       extension: .py
-#       format_name: light
-#       format_version: '1.5'
-#       jupytext_version: 1.13.7
-#   kernelspec:
-#     display_name: Python 3 (ipykernel)
-#     language: python
-#     name: python3
-# ---
-
-# +
-# generate toy data
 from __future__ import division, print_function
 import numpy as np
 import pandas as pd
 import seaborn as sns
+import torch
 import time
 import warnings
 import matplotlib.pyplot as plt
 import os
+import torch.distributions as dist
 
 # set gpu device - only important for multi gpu systems
 os.environ['CUDA_VISIBLE_DEVICES'] = '0'
@@ -31,46 +16,181 @@ os.environ['CUDA_DEVICE_ORDER'] = 'PCI_BUS_ID'
 rng = np.random.RandomState(1)
 
 num_samples = 20
-# num_samples = 10000
 
 data_x = rng.uniform(low=-4, high=4, size=(num_samples,))
 data_y = data_x ** 3 + rng.normal(loc=0, scale=9, size=(num_samples,))
- 
+
 linspace = np.linspace(-6, 6, num=500)
-
-# +
-# plot toy data
-# %matplotlib inline
-
-# plt.figure(figsize=(10, 7))
-# plt.plot(linspace, linspace ** 3)
-# plt.plot(data_x, data_y, 'ro')
-# plt.show()
 
 # dataframe to hold results
 cols = ['x', 'y', 'mode', 'mc']
 
+
+def merge_dicts(x, y):
+    z = x.copy()
+    z.update(y)
+    return z
+
+
+def generate_N(name, d, N):
+    l = {}
+    for i in range(N):
+        l[(name + "_" + str(i))] = d
+        # l.append()
+    return l
+
+
+basic_config = {
+    "lr": 0.01,  # Optimiser, Learning Rate
+    "adam_eps": 1e-5,  # 1e-5
+    "training_it": 40,
+    "mc_steps": 100,
+    "hidden_size": 100,
+    "loss_crit": lambda x, y: torch.sum(-1 * dist.Normal(0., 9.).log_prob(x - y)),
+}
+
+FIG_NAME = "figures/hypernet_noise1_shared_tensorflow"
+STD_DEV_MULT = 1
+LEGEND = False
 exps = {
+    **generate_N("implicit_fullkl_structured", merge_dicts(basic_config, {
+        "desc": 'Bayes by Hypernet (torch)',
+        "training_it": 200,
+        "lr": 0.01,
+        "noise_shape": 200,
+        "noise_sharing": False
+    }), 5),
+
+
+    # **generate_N("bbb", merge_dicts(basic_config, {
+    #     "desc": 'Bayes by Backprop (torch)',
+    #     "training_it": 40,
+    #     "lr": 0.1,
+    #     "loss_crit": torch.nn.MSELoss()
+    # }), 5),
+    # **generate_N("ensemble_pytorch", merge_dicts(basic_config, {
+    #     "desc": "Ensemble",
+    #     "adv_alpha": 0.5,
+    #     "adv_eps": 1e-2,
+    #     "training_it": 40,
+    #     "lr": 0.1,
+    #     "num_net": 10,
+    #     "mc_steps": 42,  # note: no impact; ensembles is deterministic, computes average of N networks
+    # }), 5),
+    # **generate_N("dropout", merge_dicts(basic_config, {
+    #     "desc": "Dropout",
+    #     "training_it": 40,
+    #     "lr": 0.1,
+    #     "mc_steps": 42,  # note: no impact; ensembles is deterministic, computes average of N networks
+    # }), 5),
+    # **generate_N("implicit_pytorch", merge_dicts(basic_config, {
+    #     "desc": 'Bayes by Hypernet (torch)',
+    #     "training_it": 200,
+    #     "lr": 0.02,
+    #     "noise_shape": 200,
+    #     "noise_sharing": True
+    # }), 8),
+    # **generate_N("implicit_fullnoise", merge_dicts(basic_config, {
+        # 'implicit_fullnoise': 'Bayes by Hypernet with Full Noise',
+    # **generate_N("implicit_fullkl_structured", merge_dicts(basic_config, {
+    #     "desc": 'Bayes by Hypernet (torch)',
+    #     # "training_it": 200,
+    #     # "noise_shape": 200,
+    #     # "noise_sharing": True
+    # }), 8),
+    # 'ensemble_2': {"desc": 'Ensemble'},
+    # 'ensemble_3': {"desc": 'Ensemble'},
+    # 'ensemble_4': {"desc": 'Ensemble'},
+    # 'ensemble_5': {"desc": 'Ensemble'},
+    # 'ensemble_6': {"desc": 'Ensemble'},
+    # 'ensemble_8': {"desc": 'Ensemble'},
+    # 'ensemble_9': {"desc": 'Ensemble'},
+    # 'ensemble_3': 'Ensemble',
+    # 'ensemble_4': 'Ensemble',
+    # 'ensemble_5': 'Ensemble',
+    # 'ensemble_6': 'Ensemble',
+    # 'ensemble_8': 'Ensemble',
+
+    # 'implicit_pytorch': merge_dicts(basic_config, {
+    #     "desc": 'Bayes by Hypernet (torch)',
+    #     "training_it": 200,
+    #     "noise_shape": 200,
+    #     "noise_sharing": True
+    # }),
+    # 'implicit_pytorch': merge_dicts(basic_config, {
+    #     "desc": 'Bayes by Hypernet (torch)',
+    #     "training_it": 200,
+    # }),
+    # 'implicit_pytorch': merge_dicts(basic_config, {
+    #     "desc": 'Bayes by Hypernet (torch)',
+    #     "training_it": 200,
+    # }),    'implicit_pytorch': merge_dicts(basic_config, {
+    #     "desc": 'Bayes by Hypernet (torch)',
+    #     "training_it": 200,
+    # }),    'implicit_pytorch': merge_dicts(basic_config, {
+    #     "desc": 'Bayes by Hypernet (torch)',
+    #     "training_it": 200,
+    # }),    'implicit_pytorch': merge_dicts(basic_config, {
+    #     "desc": 'Bayes by Hypernet (torch)',
+    #     "training_it": 200,
+    # }),    'implicit_pytorch': merge_dicts(basic_config, {
+    #     "desc": 'Bayes by Hypernet (torch)',
+    #     "training_it": 200,
+    # }),    'implicit_pytorch': merge_dicts(basic_config, {
+    #     "desc": 'Bayes by Hypernet (torch)',
+    #     "training_it": 200,
+    # }),
+
+    # 'ensemble_2_pytorch': 'Ensemble',
+    # 'ensemble_3_pytorch': 'Ensemble',
+    # 'ensemble_4_pytorch': 'Ensemble',
+    # 'ensemble_5_pytorch': 'Ensemble',
+    # 'ensemble_6_pytorch': 'Ensemble',
+    # 'ensemble_8_pytorch': 'Ensemble',
+    # 'ensemble_9_pytorch': 'Ensemble',
+    #
+    #
+    #
+    #
     # 'vanilla': 'MAP',
-    'implicit_pytorch_1': 'Bayes by Hypernet (torch)',
-    'implicit_pytorch_2_ns10_': 'Bayes by Hypernet (torch)',
-    'implicit_pytorch_3_ns20_': 'Bayes by Hypernet (torch)',
-    'implicit_pytorch_4_ns30_': 'Bayes by Hypernet (torch)',
-    'implicit_pytorch_5_ns50_': 'Bayes by Hypernet (torch)',
-    'implicit_pytorch_6_ns100_': 'Bayes by Hypernet (torch)',
-    'implicit_pytorch_8_ns200_': 'Bayes by Hypernet (torch)',
+    # 'ensemble_1_pytorch': 'Ensemble',
+    # 'bbb_pytorch': 'Bayes by Backprop (pytorch)',
+    # 'implicit_pytorch_1_ns200_': 'Bayes by Hypernet (torch)',
+    # 'dropout1_pytorch': 'MC-Dropout',
+
+    # 'ensemble_2_pytorch': 'Ensemble',
+    # 'ensemble_3_pytorch': 'Ensemble',
+    # 'ensemble_4_pytorch': 'Ensemble',
+    # 'ensemble_5_pytorch': 'Ensemble',
+    # 'ensemble_6_pytorch': 'Ensemble',
+    # 'ensemble_8_pytorch': 'Ensemble',
+
+    # 'ensemble_2': 'Ensemble',
+    # 'ensemble_3': 'Ensemble',
+    # 'ensemble_4': 'Ensemble',
+    # 'ensemble_5': 'Ensemble',
+    # 'ensemble_6': 'Ensemble',
+    # 'ensemble_8': 'Ensemble',
+    # 'fqwfq': 'qwidhqw',
+    # 'implicit_pytorch_1_ns200_': 'Bayes by Hypernet (torch)',
+    # 'implicit_pytorch_2_ns200_': 'Bayes by Hypernet (torch)',
+    # 'implicit_pytorch_3_ns200_': 'Bayes by Hypernet (torch)',
+    # 'implicit_pytorch_4_ns200_': 'Bayes by Hypernet (torch)',
+    # 'implicit_pytorch_5_ns200_': 'Bayes by Hypernet (torch)',
+    # 'implicit_pytorch_6_ns200_': 'Bayes by Hypernet (torch)',
+    # 'implicit_pytorch_8_ns200_': 'Bayes by Hypernet (torch)',
     # 'implicit_pytorch_3': 'Bayes by Hypernet (torch)',
     # 'implicit_pytorch_4': 'Bayes by Hypernet (torch)',
     # 'implicit_pytorch_5': 'Bayes by Hypernet (torch)',
     # 'implicit_pytorch_6': 'Bayes by Hypernet (torch)',
     # 'implicit_pytorch_': 'Bayes by Hypernet (torch)',
-# 'implicit_fullkl_structured1': 'Bayes by Hypernet',
-# 'implicit_fullkl_structured2': 'Bayes by Hypernet',
-# 'implicit_fullkl_structured3': 'Bayes by Hypernet',
-# 'implicit_fullkl_structured4': 'Bayes by Hypernet',
-# 'implicit_fullkl_structured5': 'Bayes by Hypernet',
-# 'implicit_fullkl_structured6': 'Bayes by Hypernet',
-# 'implicit_fullkl_structured8': 'Bayes by Hypernet',
+    # 'implicit_fullkl_structured1': 'Bayes by Hypernet',
+    # 'implicit_fullkl_structured2': 'Bayes by Hypernet',
+    # 'implicit_fullkl_structured3': 'Bayes by Hypernet',
+    # 'implicit_fullkl_structured4': 'Bayes by Hypernet',
+    # 'implicit_fullkl_structured5': 'Bayes by Hypernet',
+    # 'implicit_fullkl_structured6': 'Bayes by Hypernet',
+    # 'implicit_fullkl_structured8': 'Bayes by Hypernet',
 
     # 'implicit_fullkl_structured': 'Bayes by Hypernet',
     # 'mnf': 'MNF',
@@ -97,15 +217,14 @@ prediction_df = pd.DataFrame(columns=cols)
 weight_dict = {}
 
 for seed, mode in enumerate(exps.keys()):
-    seed = 1
     if 'pytorch' in mode:  # pytorch
-        dataframe, weight_dict = torch_util.train_and_predict(mode, data_x, data_y, seed_int=seed)
+        dataframe, weight_dict = torch_util.train_and_predict(mode, data_x, data_y, exps[mode], seed_int=seed)
     else:  # tensorflow
-        dataframe, weight_dict = tf_util.train_and_predict(mode, data_x, data_y, seed_int=seed)
+        dataframe, weight_dict = tf_util.train_and_predict(mode, data_x, data_y, seed_int=42+seed)
 
     prediction_df = pd.concat([prediction_df, dataframe])
 
-prediction_df['title'] = [exps[f] for f in prediction_df['mode']]
+prediction_df['title'] = [exps[f]['desc'] for f in prediction_df['mode']]
 # -
 
 len(exps)
@@ -140,74 +259,81 @@ colours = sns.color_palette(n_colors=9)
 
 # +
 
-
-plt.figure(figsize=(12, 7))
-plt.plot(linspace, linspace ** 3, '--', label='Real function')
-plt.plot(data_x, data_y, 'o', color='black', label='Samples')
-for i, (mode, label) in enumerate(t.items()):
-    mode_df = prediction_df[prediction_df['mode'] == mode]
-    groups = mode_df.groupby(['x'])
-    mean_pred = groups.mean().values[:, 0]
-    std_pred = groups.std().values[:, 0]
-    plt.plot(linspace, mean_pred, color=colours[i], label=label)
-
-    if not mode == 'vanilla':
-        plt.fill_between(linspace,
-                         mean_pred + 1 * std_pred,
-                         mean_pred - 1 * std_pred,
-                         color=colours[i], alpha=0.3)
-        plt.fill_between(linspace,
-                         mean_pred + 2 * std_pred,
-                         mean_pred - 2 * std_pred,
-                         color=colours[i], alpha=0.2)
-        plt.fill_between(linspace,
-                         mean_pred + 3 * std_pred,
-                         mean_pred - 3 * std_pred,
-                         color=colours[i], alpha=0.1)
-plt.ylim(-100, 100)
-l = plt.legend(loc=0)
-l.set_title('')
-sns.despine()
-plt.show()
-# -
+#
+# # plt.figure(figsize=(12, 7))
+# plt.figure(figsize=(12, len(t.items())))
+#
+# plt.plot(linspace, linspace ** 3, '--', label='Real function')
+# plt.plot(data_x, data_y, 'o', color='black', label='Samples')
+# for i, (mode, config) in enumerate(t.items()):
+#     mode_df = prediction_df[prediction_df['mode'] == mode]
+#     groups = mode_df.groupby(['x'])
+#     mean_pred = groups.mean().values[:, 0]
+#     std_pred = groups.std().values[:, 0]
+#     plt.plot(linspace, mean_pred, color=colours[i], label=config['desc'])
+#
+#     if not mode == 'vanilla':
+#         plt.fill_between(linspace,
+#                          mean_pred + 1 * std_pred,
+#                          mean_pred - 1 * std_pred,
+#                          color=colours[i], alpha=0.3)
+#         plt.fill_between(linspace,
+#                          mean_pred + 2 * std_pred,
+#                          mean_pred - 2 * std_pred,
+#                          color=colours[i], alpha=0.2)
+#         plt.fill_between(linspace,
+#                          mean_pred + 3 * std_pred,
+#                          mean_pred - 3 * std_pred,
+#                          color=colours[i], alpha=0.1)
+# plt.ylim(-100, 100)
+# l = plt.legend(loc=0)
+# l.set_title('')
+# sns.despine()
+# plt.show()
+# # -
 
 len(exps.keys())
 
-fig, axes = plt.subplots(1, 9, figsize=(40, 7), sharey=True)
-for i, (mode, label) in enumerate(exps.items()):
+
+plt.rcParams.update({'font.size': 24})
+fig, axes = plt.subplots(1, len(exps.items()), figsize=(30, 8), sharey=True)
+for i, (mode, config) in enumerate(exps.items()):
     # axes[i].set_title(label)
-    axes[i].plot(linspace, linspace ** 3, '--', label='Real function')
-    axes[i].plot(data_x, data_y, 'o', color='black', label='Samples')
+    axes[i].plot(linspace, linspace ** 3, '--', label='Real function', linewidth=4)
+    axes[i].plot(data_x, data_y, 'o', color='black', label='Samples',  ms=10)
 
     mode_df = prediction_df[prediction_df['mode'] == mode]
     groups = mode_df.groupby(['x'])
     mean_pred = groups.mean().values[:, 0]
     std_pred = groups.std().values[:, 0]
-    axes[i].plot(linspace, mean_pred, color=colours[i], label=label)
+    axes[i].plot(linspace, mean_pred, color=colours[i], label=config['desc'], linewidth=4)
 
     if not mode == 'vanilla':
         axes[i].fill_between(linspace,
-                             mean_pred + 1 * std_pred,
-                             mean_pred - 1 * std_pred,
+                             mean_pred + 1 * std_pred * STD_DEV_MULT,
+                             mean_pred - 1 * std_pred * STD_DEV_MULT,
                              color=colours[i], alpha=0.3)
         axes[i].fill_between(linspace,
-                             mean_pred + 2 * std_pred,
-                             mean_pred - 2 * std_pred,
+                             mean_pred + 2 * std_pred * STD_DEV_MULT,
+                             mean_pred - 2 * std_pred * STD_DEV_MULT,
                              color=colours[i], alpha=0.2)
         axes[i].fill_between(linspace,
-                             mean_pred + 3 * std_pred,
-                             mean_pred - 3 * std_pred,
+                             mean_pred + 3 * std_pred * STD_DEV_MULT,
+                             mean_pred - 3 * std_pred * STD_DEV_MULT,
                              color=colours[i], alpha=0.1)
 
-    l = axes[i].legend(loc=0)
-    l.set_title('')
+    if LEGEND:
+        l = axes[i].legend(loc=0)
+        l.set_title('')
 plt.ylim(-100, 100)
 sns.despine()
 plt.tight_layout()
-plt.show()
+plt.savefig(FIG_NAME)
+# plt.show()
 
+exit(0)
 fig, axes = plt.subplots(1, 6, figsize=(40, 7), sharey=True)
-for i, (mode, label) in enumerate(t.items()):
+for i, (mode, config) in enumerate(t.items()):
     # axes[i].set_title(label)
     axes[i].plot(linspace, linspace ** 3, '--', label='Real function')
     axes[i].plot(data_x, data_y, 'o', color='black', label='Samples')
@@ -216,7 +342,7 @@ for i, (mode, label) in enumerate(t.items()):
     groups = mode_df.groupby(['x'])
     mean_pred = groups.mean().values[:, 0]
     std_pred = groups.std().values[:, 0]
-    axes[i].plot(linspace, mean_pred, color=colours[0], label=label)
+    axes[i].plot(linspace, mean_pred, color=colours[0], label=config['desc'])
 
     if not mode == 'vanilla':
         axes[i].fill_between(linspace,
@@ -240,7 +366,7 @@ plt.tight_layout()
 plt.show()
 
 fig, axes = plt.subplots(2, 3, figsize=(20, 14), sharey=True)
-for i, (mode, label) in enumerate(t.items()):
+for i, (mode, config) in enumerate(t.items()):
     row = i // 3
     col = i % 3
     # axes[row, col].set_title(label)
@@ -251,7 +377,7 @@ for i, (mode, label) in enumerate(t.items()):
     groups = mode_df.groupby(['x'])
     mean_pred = groups.mean().values[:, 0]
     std_pred = groups.std().values[:, 0]
-    axes[row, col].plot(linspace, mean_pred, color=colours[i], label=label)
+    axes[row, col].plot(linspace, mean_pred, color=colours[i], label=config)
 
     if not mode == 'vanilla':
         axes[row, col].fill_between(linspace,
@@ -275,7 +401,7 @@ plt.tight_layout()
 plt.show()
 
 fig, axes = plt.subplots(3, 3, figsize=(20, 14), sharey=True)
-for i, (mode, label) in enumerate(exps.items()):
+for i, (mode, config) in enumerate(exps.items()):
     row = i // 3
     col = i % 3
     # axes[row, col].set_title(label)
@@ -286,7 +412,7 @@ for i, (mode, label) in enumerate(exps.items()):
     groups = mode_df.groupby(['x'])
     mean_pred = groups.mean().values[:, 0]
     std_pred = groups.std().values[:, 0]
-    axes[row, col].plot(linspace, mean_pred, color=colours[i], label=label)
+    axes[row, col].plot(linspace, mean_pred, color=colours[i], label=config)
 
     if not mode == 'vanilla':
         axes[row, col].fill_between(linspace,
@@ -310,7 +436,7 @@ plt.tight_layout()
 plt.show()
 
 fig, axes = plt.subplots(3, 3, figsize=(17, 10), sharey=True)
-for i, (mode, label) in enumerate(exps.items()):
+for i, (mode, config) in enumerate(exps.items()):
     row = i // 3
     col = i % 3
     # axes[row, col].set_title(label)
@@ -321,7 +447,7 @@ for i, (mode, label) in enumerate(exps.items()):
     groups = mode_df.groupby(['x'])
     mean_pred = groups.mean().values[:, 0]
     std_pred = groups.std().values[:, 0]
-    axes[row, col].plot(linspace, mean_pred, color=colours[0], label=label)
+    axes[row, col].plot(linspace, mean_pred, color=colours[0], label=config)
 
     if not mode == 'vanilla':
         axes[row, col].fill_between(linspace,
@@ -493,7 +619,7 @@ exps_small = {'mnf': 'MNF',
               'ensemble': 'Ensemble'}
 
 fig, axes = plt.subplots(2, 3, figsize=(12, 5.5), sharey=True)
-for i, (mode, label) in enumerate(exps_small.items()):
+for i, (mode, config) in enumerate(exps_small.items()):
     row = i // 3
     col = i % 3
     # axes[row, col].set_title(label)
@@ -504,7 +630,7 @@ for i, (mode, label) in enumerate(exps_small.items()):
     groups = mode_df.groupby(['x'])
     mean_pred = groups.mean().values[:, 0]
     std_pred = groups.std().values[:, 0]
-    axes[row, col].plot(linspace, mean_pred, color=colours[0], label=label)
+    axes[row, col].plot(linspace, mean_pred, color=colours[0], label=config)
 
     if not mode == 'vanilla':
         axes[row, col].fill_between(linspace,
@@ -520,7 +646,7 @@ for i, (mode, label) in enumerate(exps_small.items()):
                                     mean_pred - 3 * std_pred,
                                     color=colours[0], alpha=0.1)
 
-    axes[row, col].set_title(label, size='larger')
+    axes[row, col].set_title(config, size='larger')
     # l = axes[row, col].legend(loc=0)
     # l.set_title('')
 plt.ylim(-100, 100)
@@ -542,8 +668,8 @@ exps = {
 with warnings.catch_warnings():
     warnings.simplefilter("ignore")
     fig, axes = plt.subplots(1, 9, figsize=(22, 2.7), sharey=True)
-    for i, (mode, label) in enumerate(exps.items()):
-        axes[i].set_title(label)
+    for i, (mode, config) in enumerate(exps.items()):
+        axes[i].set_title(config)
         axes[i].plot(linspace, linspace ** 3, '--', label='Real function')
         axes[i].plot(data_x, data_y, '.', color='black', label='Samples')
 
@@ -551,7 +677,7 @@ with warnings.catch_warnings():
         groups = mode_df.groupby(['x'])
         mean_pred = groups.mean().as_matrix()[:, 0]
         std_pred = groups.std().as_matrix()[:, 0]
-        axes[i].plot(linspace, mean_pred, color=colours[0], label=label)
+        axes[i].plot(linspace, mean_pred, color=colours[0], label=config)
 
         if not mode == 'vanilla':
             axes[i].fill_between(linspace,
@@ -590,8 +716,8 @@ fig, axes = plt.subplots(1, 7, figsize=(15, 2.7), sharey=True)
 
 with warnings.catch_warnings():
     warnings.simplefilter("ignore")
-    for i, (mode, label) in enumerate(exps.items()):
-        axes[i].set_title(label)
+    for i, (mode, config) in enumerate(exps.items()):
+        axes[i].set_title(config)
         axes[i].plot(linspace, linspace ** 3, '--', label='Real function')
         axes[i].plot(data_x, data_y, '.', color='black', label='Samples')
 
@@ -599,7 +725,7 @@ with warnings.catch_warnings():
         groups = mode_df.groupby(['x'])
         mean_pred = groups.mean().as_matrix()[:, 0]
         std_pred = groups.std().as_matrix()[:, 0]
-        axes[i].plot(linspace, mean_pred, color=colours[0], label=label)
+        axes[i].plot(linspace, mean_pred, color=colours[0], label=config)
 
         if not mode == 'vanilla':
             axes[i].fill_between(linspace,
